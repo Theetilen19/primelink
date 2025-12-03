@@ -11,11 +11,6 @@ class CustomerController extends Controller
 {
     protected $mikrotik;
 
-    public function __construct(MikrotikService $mikrotik)
-    {
-        $this->mikrotik = $mikrotik;
-    }
-
     public function index(Request $request)
     {
         $query = \App\Models\Customer::with('package');
@@ -116,15 +111,21 @@ class CustomerController extends Controller
             event(new CustomerSuspended($customer));
         }
 
-        // Sync with Mikrotik if PPPoE credentials changed
-        if ($customer->pppoe_username && $this->mikrotik->isConnected()) {
-            if ($validated['status'] === 'active') {
-                $this->mikrotik->createPPPoESecret([
-                    'username' => $customer->pppoe_username,
-                    'password' => $customer->pppoe_password,
-                    'profile' => $customer->package->mikrotik_profile ?? 'default',
-                    'comment' => "Customer: {$customer->name}",
-                ]);
+        // Sync with Mikrotik if PPPoE credentials changed (lazy load)
+        if ($customer->pppoe_username && $validated['status'] === 'active') {
+            try {
+                $mikrotik = app(MikrotikService::class);
+                if ($mikrotik->isConnected()) {
+                    $mikrotik->createPPPoESecret([
+                        'username' => $customer->pppoe_username,
+                        'password' => $customer->pppoe_password,
+                        'profile' => $customer->package->mikrotik_profile ?? 'default',
+                        'comment' => "Customer: {$customer->name}",
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Log error but don't fail the request
+                \Log::warning('Mikrotik sync failed: ' . $e->getMessage());
             }
         }
 
