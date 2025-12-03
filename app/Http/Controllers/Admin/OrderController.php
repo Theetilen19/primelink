@@ -12,15 +12,6 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    protected $mikrotik;
-    protected $whatsapp;
-
-    public function __construct(MikrotikService $mikrotik, WhatsAppService $whatsapp)
-    {
-        $this->mikrotik = $mikrotik;
-        $this->whatsapp = $whatsapp;
-    }
-
     public function index(Request $request)
     {
         $query = Order::with(['package', 'technician'])->latest();
@@ -77,9 +68,13 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $order->update($validated);
 
-        // Send notification to customer
+        // Send notification to customer (async/lazy)
         if ($oldStatus !== $validated['status']) {
-            $this->notifyCustomer($order, $validated['status']);
+            try {
+                $this->notifyCustomer($order, $validated['status']);
+            } catch (\Exception $e) {
+                \Log::warning('Order notification failed: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
@@ -95,14 +90,18 @@ class OrderController extends Controller
             'paid_at' => now(),
         ]);
 
-        // Notify customer
-        $message = "✅ *Pembayaran Dikonfirmasi*\n\n";
-        $message .= "Halo *{$order->customer_name}*,\n\n";
-        $message .= "Pembayaran untuk pesanan *{$order->order_number}* telah dikonfirmasi.\n\n";
-        $message .= "Tim kami akan segera menghubungi Anda untuk jadwal pemasangan.\n\n";
-        $message .= "Terima kasih!\n*" . config('app.name') . "*";
+        // Notify customer (lazy load WhatsApp service)
+        try {
+            $message = "✅ *Pembayaran Dikonfirmasi*\n\n";
+            $message .= "Halo *{$order->customer_name}*,\n\n";
+            $message .= "Pembayaran untuk pesanan *{$order->order_number}* telah dikonfirmasi.\n\n";
+            $message .= "Tim kami akan segera menghubungi Anda untuk jadwal pemasangan.\n\n";
+            $message .= "Terima kasih!\n*" . config('app.name') . "*";
 
-        $this->whatsapp->send($order->customer_phone, $message);
+            app(WhatsAppService::class)->send($order->customer_phone, $message);
+        } catch (\Exception $e) {
+            \Log::warning('WhatsApp notification failed: ' . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,
@@ -135,28 +134,37 @@ class OrderController extends Controller
                 'pppoe_password' => $password,
             ]);
 
-            // Create PPPoE secret in Mikrotik
-            if ($this->mikrotik->isConnected()) {
-                $this->mikrotik->createPPPoESecret([
-                    'username' => $username,
-                    'password' => $password,
-                    'profile' => $order->package->pppoe_profile ?? 'default',
-                    'comment' => "Customer: {$customer->name}",
-                ]);
+            // Create PPPoE secret in Mikrotik (lazy load)
+            try {
+                $mikrotik = app(MikrotikService::class);
+                if ($mikrotik->isConnected()) {
+                    $mikrotik->createPPPoESecret([
+                        'username' => $username,
+                        'password' => $password,
+                        'profile' => $order->package->pppoe_profile ?? 'default',
+                        'comment' => "Customer: {$customer->name}",
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Mikrotik PPPoE creation failed: ' . $e->getMessage());
             }
 
             // Send credentials to customer
-            $message = "🎉 *Selamat! Pemasangan Selesai*\n\n";
-            $message .= "Halo *{$customer->name}*,\n\n";
-            $message .= "Layanan internet Anda sudah aktif!\n\n";
-            $message .= "📋 *Kredensial PPPoE:*\n";
-            $message .= "👤 Username: `{$username}`\n";
-            $message .= "🔑 Password: `{$password}`\n\n";
-            $message .= "📦 Paket: {$order->package->name}\n";
-            $message .= "⚡ Kecepatan: {$order->package->speed}\n\n";
-            $message .= "Terima kasih telah berlangganan!\n*" . config('app.name') . "*";
+            try {
+                $message = "🎉 *Selamat! Pemasangan Selesai*\n\n";
+                $message .= "Halo *{$customer->name}*,\n\n";
+                $message .= "Layanan internet Anda sudah aktif!\n\n";
+                $message .= "📋 *Kredensial PPPoE:*\n";
+                $message .= "👤 Username: `{$username}`\n";
+                $message .= "🔑 Password: `{$password}`\n\n";
+                $message .= "📦 Paket: {$order->package->name}\n";
+                $message .= "⚡ Kecepatan: {$order->package->speed}\n\n";
+                $message .= "Terima kasih telah berlangganan!\n*" . config('app.name') . "*";
 
-            $this->whatsapp->send($customer->phone, $message);
+                app(WhatsAppService::class)->send($customer->phone, $message);
+            } catch (\Exception $e) {
+                \Log::warning('WhatsApp credentials notification failed: ' . $e->getMessage());
+            }
         }
 
         // Update order
@@ -185,7 +193,7 @@ class OrderController extends Controller
         ];
 
         if (isset($messages[$status])) {
-            $this->whatsapp->send($order->customer_phone, $messages[$status]);
+            app(WhatsAppService::class)->send($order->customer_phone, $messages[$status]);
         }
     }
 
