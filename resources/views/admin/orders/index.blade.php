@@ -165,19 +165,46 @@
 @push('scripts')
 <script>
 function confirmPayment(orderId) {
-    if (!confirm('Konfirmasi pembayaran untuk pesanan ini?')) return;
-    
-    fetch(`/admin/orders/${orderId}/confirm-payment`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    Swal.fire({
+        title: 'Konfirmasi Pembayaran?',
+        text: 'Apakah Anda yakin ingin mengkonfirmasi pembayaran pesanan ini?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0891b2',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Konfirmasi!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading('Memproses...');
+            fetch(`/admin/orders/${orderId}/confirm-payment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => location.reload());
+                } else {
+                    showError(data.message || 'Terjadi kesalahan');
+                }
+            })
+            .catch(err => {
+                Swal.close();
+                showError('Terjadi kesalahan jaringan');
+            });
         }
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) location.reload();
     });
 }
 </script>

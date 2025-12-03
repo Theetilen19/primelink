@@ -221,44 +221,126 @@ document.getElementById('statusForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     
-    fetch('{{ route("admin.orders.update-status", $order) }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify(Object.fromEntries(formData))
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) location.reload();
+    Swal.fire({
+        title: 'Update Status?',
+        text: 'Apakah Anda yakin ingin mengupdate status pesanan?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0891b2',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Update!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading('Menyimpan...');
+            fetch('{{ route("admin.orders.update-status", $order) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => location.reload());
+                } else {
+                    showError(data.message || 'Terjadi kesalahan');
+                }
+            })
+            .catch(() => {
+                Swal.close();
+                showError('Terjadi kesalahan jaringan');
+            });
+        }
     });
 });
 
 function confirmPayment() {
-    if (!confirm('Konfirmasi pembayaran?')) return;
-    fetch('{{ route("admin.orders.confirm-payment", $order) }}', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) location.reload();
+    Swal.fire({
+        title: 'Konfirmasi Pembayaran?',
+        text: 'Apakah Anda yakin pembayaran sudah diterima?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Konfirmasi!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading('Memproses...');
+            fetch('{{ route("admin.orders.confirm-payment", $order) }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pembayaran Dikonfirmasi!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => location.reload());
+                } else {
+                    showError(data.message || 'Terjadi kesalahan');
+                }
+            })
+            .catch(() => {
+                Swal.close();
+                showError('Terjadi kesalahan jaringan');
+            });
+        }
     });
 }
 
 function completeOrder() {
-    if (!confirm('Selesaikan pesanan dan buat akun pelanggan?')) return;
-    fetch('{{ route("admin.orders.complete", $order) }}', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) location.reload();
+    Swal.fire({
+        title: 'Selesaikan Pesanan?',
+        html: 'Pesanan akan diselesaikan dan <strong>akun pelanggan baru</strong> akan dibuat secara otomatis.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Selesaikan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading('Membuat akun pelanggan...');
+            fetch('{{ route("admin.orders.complete", $order) }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pesanan Selesai!',
+                        text: data.message,
+                        showConfirmButton: true,
+                        confirmButtonColor: '#0891b2'
+                    }).then(() => location.reload());
+                } else {
+                    showError(data.message || 'Terjadi kesalahan');
+                }
+            })
+            .catch(() => {
+                Swal.close();
+                showError('Terjadi kesalahan jaringan');
+            });
+        }
     });
 }
 </script>
