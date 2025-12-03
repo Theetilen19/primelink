@@ -146,10 +146,13 @@
                                             <a href="{{ route('admin.packages.edit', $package) }}" class="text-blue-600 hover:text-blue-800 transition" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this package?')">
+                                            <a href="{{ route('admin.packages.show', $package) }}" class="text-cyan-600 hover:text-cyan-800 transition" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <form id="delete-package-{{ $package->id }}" action="{{ route('admin.packages.destroy', $package) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Delete">
+                                                <button type="button" onclick="confirmDelete('delete-package-{{ $package->id }}', '{{ $package->name }}')" class="text-red-600 hover:text-red-800 transition" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

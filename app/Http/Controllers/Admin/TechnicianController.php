@@ -57,13 +57,7 @@ class TechnicianController extends Controller
 
     public function show(\App\Models\Technician $technician)
     {
-        $stats = [
-            'total_jobs' => 0, // Will be implemented with work orders
-            'completed_jobs' => 0,
-            'pending_jobs' => 0,
-        ];
-
-        return view('admin.technicians.show', compact('technician', 'stats'));
+        return view('admin.technicians.show', compact('technician'));
     }
 
     public function edit(\App\Models\Technician $technician)
@@ -81,10 +75,10 @@ class TechnicianController extends Controller
             'notes' => 'nullable|string',
             'area_coverage' => 'nullable|string',
             'whatsapp_group_id' => 'nullable|string',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|in:0,1',
         ]);
 
-        $validated['is_active'] = $request->has('is_active');
+        $validated['is_active'] = $request->input('is_active', 0) == 1;
 
         $technician->update($validated);
 

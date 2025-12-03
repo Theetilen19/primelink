@@ -3,10 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Events\CustomerSuspended;
+use App\Services\MikrotikService;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    protected $mikrotik;
+
+    public function __construct(MikrotikService $mikrotik)
+    {
+        $this->mikrotik = $mikrotik;
+    }
+
     public function index(Request $request)
     {
         $query = \App\Models\Customer::with('package');
@@ -95,9 +104,29 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
             'package_id' => 'nullable|exists:packages,id',
             'status' => 'required|in:active,inactive,suspended',
+            'pppoe_username' => 'nullable|string|max:255',
+            'pppoe_password' => 'nullable|string|max:255',
         ]);
 
+        $oldStatus = $customer->status;
         $customer->update($validated);
+
+        // Fire event if customer is suspended
+        if ($oldStatus !== 'suspended' && $validated['status'] === 'suspended') {
+            event(new CustomerSuspended($customer));
+        }
+
+        // Sync with Mikrotik if PPPoE credentials changed
+        if ($customer->pppoe_username && $this->mikrotik->isConnected()) {
+            if ($validated['status'] === 'active') {
+                $this->mikrotik->createPPPoESecret([
+                    'username' => $customer->pppoe_username,
+                    'password' => $customer->pppoe_password,
+                    'profile' => $customer->package->mikrotik_profile ?? 'default',
+                    'comment' => "Customer: {$customer->name}",
+                ]);
+            }
+        }
 
         return redirect()->route('admin.customers.index')
             ->with('success', 'Customer updated successfully!');

@@ -59,13 +59,7 @@ class CollectorController extends Controller
 
     public function show(\App\Models\Collector $collector)
     {
-        $stats = [
-            'total_collections' => 0, // Will be implemented with payment records
-            'total_amount' => 0,
-            'total_commission' => 0,
-        ];
-
-        return view('admin.collectors.show', compact('collector', 'stats'));
+        return view('admin.collectors.show', compact('collector'));
     }
 
     public function edit(\App\Models\Collector $collector)

@@ -13,81 +13,113 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="mt-8 px-4 space-y-2 overflow-y-auto" style="max-height: calc(100vh - 140px);">
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.dashboard') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-home mr-3"></i>
+    <nav class="mt-4 px-4 space-y-1 overflow-y-auto" style="max-height: calc(100vh - 140px);">
+        
+        <!-- Main Menu -->
+        <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2 mt-2">Main Menu</p>
+        
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.dashboard') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-home w-5 mr-3"></i>
             <span>Dashboard</span>
         </a>
         
-        <a href="{{ route('admin.customers.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-users mr-3"></i>
+        <a href="{{ route('admin.customers.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-users w-5 mr-3"></i>
             <span>Customers</span>
         </a>
         
-        <a href="{{ route('admin.packages.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.packages.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-box mr-3"></i>
+        <a href="{{ route('admin.packages.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.packages.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-box w-5 mr-3"></i>
             <span>Packages</span>
         </a>
         
-        <a href="{{ route('admin.invoices.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.invoices.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-file-invoice mr-3"></i>
+        <a href="{{ route('admin.invoices.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.invoices.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-file-invoice w-5 mr-3"></i>
             <span>Invoices</span>
         </a>
         
-        <a href="{{ route('admin.technicians.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.technicians.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-tools mr-3"></i>
+        <!-- Staff Management -->
+        <div class="border-t border-cyan-500/20 my-3"></div>
+        <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Staff</p>
+        
+        <a href="{{ route('admin.technicians.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.technicians.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-tools w-5 mr-3"></i>
             <span>Technicians</span>
         </a>
         
-        <a href="{{ route('admin.collectors.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.collectors.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-hand-holding-usd mr-3"></i>
+        <a href="{{ route('admin.collectors.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.collectors.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-hand-holding-usd w-5 mr-3"></i>
             <span>Collectors</span>
         </a>
         
-        <a href="{{ route('admin.agents.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.agents.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-user-tie mr-3"></i>
+        <a href="{{ route('admin.agents.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.agents.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-user-tie w-5 mr-3"></i>
             <span>Agents</span>
         </a>
         
-        <a href="{{ route('admin.vouchers.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.vouchers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-ticket-alt mr-3"></i>
+        <!-- Network & Voucher -->
+        <div class="border-t border-cyan-500/20 my-3"></div>
+        <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Network</p>
+        
+        <a href="{{ route('admin.vouchers.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.vouchers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-ticket-alt w-5 mr-3"></i>
             <span>Vouchers</span>
         </a>
         
-        <a href="{{ route('admin.network.map') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-map-marked-alt mr-3"></i>
+        <a href="{{ route('admin.network.odps.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.odps.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-project-diagram w-5 mr-3"></i>
+            <span>ODP Management</span>
+        </a>
+        
+        <a href="{{ route('admin.network.map') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.map') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-map-marked-alt w-5 mr-3"></i>
             <span>Network Map</span>
         </a>
         
-        <!-- Divider -->
-        <div class="border-t border-cyan-500/20 my-4"></div>
+        <!-- Integration Services -->
+        <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Integration</p>
         
-        <a href="{{ route('admin.mikrotik.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.mikrotik.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-server mr-3"></i>
+        <a href="{{ route('admin.mikrotik.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.mikrotik.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-server w-5 mr-3"></i>
             <span>Mikrotik</span>
+            <span class="ml-auto text-xs px-2 py-0.5 bg-cyan-500/30 text-cyan-300 rounded">PPPoE</span>
         </a>
         
-        <a href="{{ route('admin.cpe.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.cpe.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-router mr-3"></i>
-            <span>CPE Management</span>
+        <a href="{{ route('admin.cpe.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.cpe.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-router w-5 mr-3"></i>
+            <span>CPE / ONU</span>
+            <span class="ml-auto text-xs px-2 py-0.5 bg-blue-500/30 text-blue-300 rounded">TR-069</span>
         </a>
         
-        <!-- Divider -->
-        <div class="border-t border-cyan-500/20 my-4"></div>
+        <a href="{{ route('admin.whatsapp.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.whatsapp.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fab fa-whatsapp w-5 mr-3"></i>
+            <span>WhatsApp</span>
+            <span class="ml-auto text-xs px-2 py-0.5 bg-green-500/30 text-green-300 rounded">Gateway</span>
+        </a>
         
-        <a href="{{ route('admin.settings') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.settings') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-cog mr-3"></i>
+        <a href="{{ route('admin.payment.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.payment.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-credit-card w-5 mr-3"></i>
+            <span>Payment</span>
+            <span class="ml-auto text-xs px-2 py-0.5 bg-yellow-500/30 text-yellow-300 rounded">Gateway</span>
+        </a>
+        
+        <!-- Settings -->
+        <div class="border-t border-cyan-500/20 my-3"></div>
+        <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">System</p>
+        
+        <a href="{{ route('admin.settings') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.settings') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-cog w-5 mr-3"></i>
             <span>Settings</span>
         </a>
     </nav>
 
     <!-- Logout -->
-    <div class="absolute bottom-0 w-full p-4">
+    <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-slate-900 to-transparent">
         <form action="{{ route('admin.logout') }}" method="POST">
             @csrf
-            <button type="submit" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition">
-                <i class="fas fa-sign-out-alt mr-3"></i>
+            <button type="submit" class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition">
+                <i class="fas fa-sign-out-alt w-5 mr-3"></i>
                 <span>Logout</span>
             </button>
         </form>

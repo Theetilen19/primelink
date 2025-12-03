@@ -3,10 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Events\InvoicePaid;
+use App\Services\WhatsAppService;
+use App\Services\PaymentGatewayService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+    protected $whatsapp;
+    protected $paymentGateway;
+
+    public function __construct(WhatsAppService $whatsapp, PaymentGatewayService $paymentGateway)
+    {
+        $this->whatsapp = $whatsapp;
+        $this->paymentGateway = $paymentGateway;
+    }
+
     public function index(Request $request)
     {
         $query = \App\Models\Invoice::with(['customer', 'package']);
@@ -119,7 +131,7 @@ class InvoiceController extends Controller
             ->with('success', 'Invoice deleted successfully!');
     }
 
-    public function pay(\App\Models\Invoice $invoice)
+    public function pay(Request $request, \App\Models\Invoice $invoice)
     {
         if ($invoice->status === 'paid') {
             return redirect()->back()
@@ -129,10 +141,103 @@ class InvoiceController extends Controller
         $invoice->update([
             'status' => 'paid',
             'paid_date' => now(),
+            'payment_method' => $request->input('payment_method', 'cash'),
+            'collected_by' => auth()->id(),
         ]);
+
+        // Fire event for automatic activation
+        event(new InvoicePaid($invoice));
 
         return redirect()->back()
             ->with('success', 'Invoice marked as paid!');
+    }
+
+    /**
+     * Send invoice notification via WhatsApp
+     */
+    public function sendNotification(\App\Models\Invoice $invoice)
+    {
+        $customer = $invoice->customer;
+
+        if (!$customer || !$customer->phone) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer phone not found'
+            ], 404);
+        }
+
+        $result = $this->whatsapp->sendInvoiceNotification($customer, $invoice);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Create payment link
+     */
+    public function createPaymentLink(\App\Models\Invoice $invoice)
+    {
+        $customer = $invoice->customer;
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found'
+            ], 404);
+        }
+
+        $result = $this->paymentGateway->createPayment($invoice, $customer);
+
+        if ($result['success']) {
+            $invoice->update([
+                'payment_gateway' => $result['gateway'],
+                'payment_order_id' => $result['order_id'],
+            ]);
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Send payment link via WhatsApp
+     */
+    public function sendPaymentLink(\App\Models\Invoice $invoice)
+    {
+        $customer = $invoice->customer;
+
+        if (!$customer || !$customer->phone) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer phone not found'
+            ], 404);
+        }
+
+        // Create payment link first
+        $paymentResult = $this->paymentGateway->createPayment($invoice, $customer);
+
+        if (!$paymentResult['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create payment link'
+            ], 500);
+        }
+
+        // Send via WhatsApp
+        $message = "Halo *{$customer->name}*,\n\n";
+        $message .= "Berikut link pembayaran untuk tagihan Anda:\n\n";
+        $message .= "📋 *Invoice:* {$invoice->invoice_number}\n";
+        $message .= "💰 *Total:* Rp " . number_format($invoice->amount, 0, ',', '.') . "\n\n";
+        $message .= "🔗 *Link Pembayaran:*\n{$paymentResult['payment_url']}\n\n";
+        $message .= "Link ini berlaku selama 24 jam.\n\n";
+        $message .= "Terima kasih,\n";
+        $message .= "*" . config('app.name') . "*";
+
+        $waResult = $this->whatsapp->send($customer->phone, $message);
+
+        return response()->json([
+            'success' => $waResult['success'],
+            'message' => $waResult['success'] ? 'Payment link sent via WhatsApp' : 'Failed to send WhatsApp',
+            'payment_url' => $paymentResult['payment_url']
+        ]);
     }
 
     public function print(\App\Models\Invoice $invoice)

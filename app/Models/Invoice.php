@@ -17,6 +17,11 @@ class Invoice extends Model
         'paid_date',
         'invoice_number',
         'invoice_type',
+        'payment_gateway',
+        'payment_order_id',
+        'transaction_id',
+        'payment_method',
+        'collected_by',
     ];
 
     protected $casts = [
@@ -34,6 +39,11 @@ class Invoice extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+
+    public function collector()
+    {
+        return $this->belongsTo(User::class, 'collected_by');
     }
 
     public function getTotalAmountAttribute()

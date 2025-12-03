@@ -21,16 +21,6 @@
                 </a>
             </div>
 
-            <!-- Success Message -->
-            @if(session('success'))
-                <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
-                    <div class="flex items-center">
-                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                        <p class="text-green-700">{{ session('success') }}</p>
-                    </div>
-                </div>
-            @endif
-
             <!-- Filters -->
             <div class="bg-white rounded-xl shadow-md p-6 mb-6">
                 <form method="GET" action="{{ route('admin.agents.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -98,10 +88,10 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end space-x-2">
-                                            <form action="{{ route('admin.agents.topup', $agent) }}" method="POST" class="inline" onsubmit="return confirm('Top up balance?')">
+                                            <form id="topup-agent-{{ $agent->id }}" action="{{ route('admin.agents.topup', $agent) }}" method="POST" class="inline">
                                                 @csrf
-                                                <input type="hidden" name="amount" value="100000"> <!-- Default topup for quick action -->
-                                                <button type="submit" class="text-green-600 hover:text-green-900" title="Quick Topup 100k">
+                                                <input type="hidden" name="amount" value="100000">
+                                                <button type="button" onclick="confirmAction('Top up Rp 100.000 untuk {{ $agent->name }}?', () => document.getElementById('topup-agent-{{ $agent->id }}').submit())" class="text-green-600 hover:text-green-900" title="Quick Topup 100k">
                                                     <i class="fas fa-plus-circle"></i>
                                                 </button>
                                             </form>
@@ -111,10 +101,10 @@
                                             <a href="{{ route('admin.agents.edit', $agent) }}" class="text-yellow-600 hover:text-yellow-900" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.agents.destroy', $agent) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
+                                            <form id="delete-agent-{{ $agent->id }}" action="{{ route('admin.agents.destroy', $agent) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
+                                                <button type="button" onclick="confirmDelete('delete-agent-{{ $agent->id }}', '{{ $agent->name }}')" class="text-red-600 hover:text-red-900" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

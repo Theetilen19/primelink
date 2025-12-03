@@ -342,6 +342,276 @@ Request:
 
 ---
 
+## 📱 WhatsApp Gateway Integration
+
+### Overview
+Integrasi WhatsApp untuk notifikasi otomatis ke pelanggan (invoice, reminder, konfirmasi pembayaran).
+
+### Supported Providers
+- Fonnte (https://fonnte.com)
+- WaBlas (https://wablas.com)
+- Custom API
+
+### Configuration
+
+Edit `.env`:
+```env
+WHATSAPP_API_URL=https://api.fonnte.com
+WHATSAPP_API_KEY=your_api_key_here
+WHATSAPP_SENDER=6281234567890
+```
+
+### Features
+
+#### Send Invoice Notification
+```php
+$whatsapp->sendInvoiceNotification($customer, $invoice);
+```
+
+Message Template:
+```
+Halo *{nama}*,
+
+Tagihan internet Anda telah terbit:
+
+📋 *Invoice:* INV-000001
+📦 *Paket:* Paket 10 Mbps
+💰 *Total:* Rp 150.000
+📅 *Jatuh Tempo:* 25 Dec 2025
+
+Terima kasih,
+*GEMBOK LARA*
+```
+
+#### Send Payment Confirmation
+```php
+$whatsapp->sendPaymentConfirmation($customer, $invoice);
+```
+
+#### Send Payment Reminder
+```php
+$whatsapp->sendPaymentReminder($customer, $invoice);
+```
+
+#### Send Voucher
+```php
+$whatsapp->sendVoucher($phone, $vouchers, $packageName);
+```
+
+#### Send Suspension Notice
+```php
+$whatsapp->sendSuspensionNotice($customer);
+```
+
+### Admin Dashboard
+
+Access: `/admin/whatsapp`
+
+Features:
+- Connection status monitoring
+- Send custom messages
+- Quick actions (bulk invoice, bulk reminder)
+- Message templates preview
+
+### API Endpoints
+
+#### Send Message
+```
+POST /api/whatsapp/send
+```
+
+Request:
+```json
+{
+    "phone": "081234567890",
+    "message": "Hello World"
+}
+```
+
+#### Check Status
+```
+GET /api/whatsapp/status
+```
+
+---
+
+## 💳 Payment Gateway Integration
+
+### Overview
+Integrasi payment gateway untuk pembayaran online (Midtrans & Xendit).
+
+### Supported Gateways
+- **Midtrans**: Credit Card, Bank Transfer, E-Wallet (GoPay, OVO), Convenience Store
+- **Xendit**: Virtual Account, E-Wallet (OVO, DANA), QRIS, Retail Outlets
+
+### Configuration
+
+#### Midtrans
+Edit `.env`:
+```env
+MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxx
+MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxx
+MIDTRANS_IS_PRODUCTION=false
+```
+
+#### Xendit
+Edit `.env`:
+```env
+XENDIT_SECRET_KEY=xnd_development_xxxxx
+XENDIT_CALLBACK_TOKEN=your_callback_token
+```
+
+#### Default Gateway
+```env
+PAYMENT_DEFAULT_GATEWAY=midtrans
+```
+
+### Features
+
+#### Create Payment Link
+```php
+$result = $paymentGateway->createPayment($invoice, $customer);
+// Returns: payment_url, order_id
+```
+
+#### Create Snap Token (Midtrans)
+```php
+$result = $paymentGateway->createSnapToken($invoice, $customer);
+// Returns: token, redirect_url
+```
+
+#### Send Payment Link via WhatsApp
+```php
+// Creates payment link and sends via WhatsApp
+$paymentController->sendPaymentLink($invoice);
+```
+
+### Webhook Handlers
+
+#### Midtrans Webhook
+```
+POST /api/webhooks/midtrans
+```
+
+Automatically:
+- Verifies signature
+- Updates invoice status
+- Sends WhatsApp confirmation
+- Activates customer (if suspended)
+
+#### Xendit Webhook
+```
+POST /api/webhooks/xendit
+```
+
+Automatically:
+- Verifies callback token
+- Updates invoice status
+- Sends WhatsApp confirmation
+- Activates customer (if suspended)
+
+### Admin Dashboard
+
+Access: `/admin/payment`
+
+Features:
+- Gateway status overview
+- Configuration guide
+- Webhook URLs
+- Default gateway selection
+
+### Payment Flow
+
+1. **Create Invoice** → Invoice created with status `unpaid`
+2. **Generate Payment Link** → Payment URL created via gateway
+3. **Send to Customer** → Link sent via WhatsApp
+4. **Customer Pays** → Customer completes payment
+5. **Webhook Received** → Gateway sends notification
+6. **Invoice Updated** → Status changed to `paid`
+7. **Customer Activated** → If suspended, reactivated
+8. **Confirmation Sent** → WhatsApp confirmation sent
+
+### API Endpoints
+
+#### Create Payment
+```
+POST /admin/invoices/{invoice}/create-payment-link
+```
+
+#### Send Payment Link
+```
+POST /admin/invoices/{invoice}/send-payment-link
+```
+
+#### Check Status
+```
+GET /admin/payment/check-status?order_id=xxx&gateway=midtrans
+```
+
+---
+
+## ⏰ Automated Billing
+
+### Scheduled Tasks
+
+Configure in `routes/console.php`:
+
+```php
+// Generate monthly invoices (1st of month at 00:01)
+Schedule::command('billing:generate-invoices')
+    ->monthlyOn(1, '00:01');
+
+// Send reminders 3 days before due (daily at 09:00)
+Schedule::command('billing:send-reminders --days=3')
+    ->dailyAt('09:00');
+
+// Send reminders 1 day before due (daily at 09:00)
+Schedule::command('billing:send-reminders --days=1')
+    ->dailyAt('09:00');
+
+// Suspend overdue customers (daily at 01:00)
+Schedule::command('billing:suspend-overdue --days=7')
+    ->dailyAt('01:00');
+
+// Sync Mikrotik users (hourly)
+Schedule::command('mikrotik:sync-users --update')
+    ->hourly();
+```
+
+### Setup Cron
+
+Add to crontab:
+```bash
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### Manual Commands
+
+```bash
+# Generate invoices for current month
+php artisan billing:generate-invoices
+
+# Generate invoices for specific month
+php artisan billing:generate-invoices --month=12 --year=2025
+
+# Send reminders (3 days before due)
+php artisan billing:send-reminders --days=3
+
+# Suspend overdue (dry run)
+php artisan billing:suspend-overdue --days=7 --dry-run
+
+# Suspend overdue (execute)
+php artisan billing:suspend-overdue --days=7
+
+# Sync Mikrotik (create new)
+php artisan mikrotik:sync-users --create
+
+# Sync Mikrotik (update existing)
+php artisan mikrotik:sync-users --update
+```
+
+---
+
 ## 🔐 Security Best Practices
 
 ### Mikrotik

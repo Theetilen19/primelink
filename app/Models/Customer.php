@@ -8,6 +8,10 @@ class Customer extends Model
 {
     protected $fillable = [
         'username',
+        'pppoe_username',
+        'pppoe_password',
+        'static_ip',
+        'mac_address',
         'name',
         'phone',
         'email',

@@ -61,6 +61,9 @@ class DatabaseSeeder extends Seeder
             
             // Summary
             MonthlySummarySeeder::class,
+            
+            // Integration Settings
+            IntegrationSettingsSeeder::class,
         ]);
     }
 }

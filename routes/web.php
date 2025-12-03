@@ -47,6 +47,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('invoices', InvoiceController::class);
         Route::post('/invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
         Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+        Route::post('/invoices/{invoice}/send-notification', [InvoiceController::class, 'sendNotification'])->name('invoices.send-notification');
+        Route::post('/invoices/{invoice}/create-payment-link', [InvoiceController::class, 'createPaymentLink'])->name('invoices.create-payment-link');
+        Route::post('/invoices/{invoice}/send-payment-link', [InvoiceController::class, 'sendPaymentLink'])->name('invoices.send-payment-link');
         
         // Technician Management
         Route::resource('technicians', TechnicianController::class);
@@ -102,6 +105,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{deviceId}/wifi', [\App\Http\Controllers\Admin\CpeController::class, 'updateWifi'])->name('wifi.update');
             Route::post('/bulk-reboot', [\App\Http\Controllers\Admin\CpeController::class, 'bulkReboot'])->name('bulk.reboot');
             Route::post('/bulk-refresh', [\App\Http\Controllers\Admin\CpeController::class, 'bulkRefresh'])->name('bulk.refresh');
+        });
+        
+        // WhatsApp Gateway
+        Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\WhatsAppController::class, 'index'])->name('index');
+            Route::post('/send', [\App\Http\Controllers\Admin\WhatsAppController::class, 'send'])->name('send');
+            Route::get('/status', [\App\Http\Controllers\Admin\WhatsAppController::class, 'status'])->name('status');
+            Route::post('/invoice/{invoice}', [\App\Http\Controllers\Admin\WhatsAppController::class, 'sendInvoice'])->name('invoice');
+            Route::post('/reminder/{invoice}', [\App\Http\Controllers\Admin\WhatsAppController::class, 'sendReminder'])->name('reminder');
+            Route::post('/bulk-invoice', [\App\Http\Controllers\Admin\WhatsAppController::class, 'bulkSendInvoice'])->name('bulk.invoice');
+            Route::post('/bulk-reminder', [\App\Http\Controllers\Admin\WhatsAppController::class, 'bulkSendReminder'])->name('bulk.reminder');
+        });
+        
+        // Payment Gateway
+        Route::prefix('payment')->name('payment.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('index');
+            Route::post('/create/{invoice}', [\App\Http\Controllers\Admin\PaymentController::class, 'createPayment'])->name('create');
+            Route::get('/snap-token/{invoice}', [\App\Http\Controllers\Admin\PaymentController::class, 'getSnapToken'])->name('snap-token');
+            Route::get('/check-status', [\App\Http\Controllers\Admin\PaymentController::class, 'checkStatus'])->name('check-status');
+            Route::post('/send-link/{invoice}', [\App\Http\Controllers\Admin\PaymentController::class, 'sendPaymentLink'])->name('send-link');
         });
     });
 });

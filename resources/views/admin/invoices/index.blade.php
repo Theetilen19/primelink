@@ -173,10 +173,22 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             @if($invoice->status === 'unpaid')
-                                                <form action="{{ route('admin.invoices.pay', $invoice) }}" method="POST" class="inline">
+                                                <form id="pay-invoice-{{ $invoice->id }}" action="{{ route('admin.invoices.pay', $invoice) }}" method="POST" class="inline">
                                                     @csrf
-                                                    <button type="submit" class="text-green-600 hover:text-green-800" title="Mark as Paid">
+                                                    <button type="button" onclick="confirmAction('Tandai invoice {{ $invoice->invoice_number }} sebagai lunas?', () => document.getElementById('pay-invoice-{{ $invoice->id }}').submit())" class="text-green-600 hover:text-green-800" title="Mark as Paid">
                                                         <i class="fas fa-check-circle"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a href="{{ route('admin.invoices.edit', $invoice) }}" class="text-yellow-600 hover:text-yellow-800" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if($invoice->status === 'unpaid')
+                                                <form id="delete-invoice-{{ $invoice->id }}" action="{{ route('admin.invoices.destroy', $invoice) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete('delete-invoice-{{ $invoice->id }}', 'invoice {{ $invoice->invoice_number }}')" class="text-red-600 hover:text-red-800" title="Delete">
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
                                             @endif
