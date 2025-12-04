@@ -3,32 +3,43 @@
 @section('title', 'RADIUS Groups')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-800">RADIUS Groups (Bandwidth Profiles)</h1>
-        <button onclick="document.getElementById('addGroupModal').classList.remove('hidden')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-            <i class="fas fa-plus mr-2"></i>Add Group
-        </button>
-    </div>
+<div class="min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+    @include('admin.partials.sidebar')
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        @forelse($groups as $groupname => $attributes)
-        <div class="bg-white rounded-xl shadow p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-3">{{ $groupname }}</h3>
-            <div class="space-y-2">
-                @foreach($attributes as $attr)
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">{{ $attr->attribute }}</span>
-                    <span class="font-mono text-gray-800">{{ $attr->value }}</span>
+    <div class="lg:pl-64">
+        @include('admin.partials.topbar')
+
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">RADIUS Groups</h1>
+                    <p class="text-gray-600">Bandwidth Profiles untuk RADIUS</p>
                 </div>
-                @endforeach
+                <button onclick="document.getElementById('addGroupModal').classList.remove('hidden')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                    <i class="fas fa-plus mr-2"></i>Add Group
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @forelse($groups as $groupname => $attributes)
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">{{ $groupname }}</h3>
+                    <div class="space-y-2">
+                        @foreach($attributes as $attr)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">{{ $attr->attribute }}</span>
+                            <span class="font-mono text-gray-800">{{ $attr->value }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @empty
+                <div class="col-span-3 bg-gray-50 rounded-xl p-8 text-center text-gray-500">
+                    Belum ada group/profile
+                </div>
+                @endforelse
             </div>
         </div>
-        @empty
-        <div class="col-span-3 bg-gray-50 rounded-xl p-8 text-center text-gray-500">
-            Belum ada group/profile
-        </div>
-        @endforelse
     </div>
 </div>
 

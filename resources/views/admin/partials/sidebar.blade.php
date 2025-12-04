@@ -41,7 +41,13 @@
         <a href="{{ route('admin.orders.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.orders.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-shopping-cart w-5 mr-3"></i>
             <span>Orders</span>
-            @php $pendingOrders = \App\Models\Order::where('status', 'pending')->count(); @endphp
+            @php 
+                try {
+                    $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
+                } catch (\Exception $e) {
+                    $pendingOrders = 0;
+                }
+            @endphp
             @if($pendingOrders > 0)
             <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $pendingOrders }}</span>
             @endif
@@ -147,9 +153,15 @@
         </a>
         
         <a href="{{ route('admin.tickets.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.tickets.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-ticket-alt w-5 mr-3"></i>
+            <i class="fas fa-headset w-5 mr-3"></i>
             <span>Tickets</span>
-            @php $openTickets = \App\Models\Ticket::whereIn('status', ['open', 'in_progress'])->count(); @endphp
+            @php 
+                try {
+                    $openTickets = \App\Models\Ticket::whereIn('status', ['open', 'in_progress'])->count();
+                } catch (\Exception $e) {
+                    $openTickets = 0;
+                }
+            @endphp
             @if($openTickets > 0)
             <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $openTickets }}</span>
             @endif
