@@ -80,7 +80,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('vouchers')->name('vouchers.')->group(function () {
             Route::get('/', [VoucherController::class, 'index'])->name('index');
             Route::get('/pricing', [VoucherController::class, 'pricing'])->name('pricing');
-            Route::post('/pricing', [VoucherController::class, 'updatePricing'])->name('pricing.update');
+            Route::get('/pricing/create', [VoucherController::class, 'createPricing'])->name('pricing.create');
+            Route::post('/pricing/store', [VoucherController::class, 'storePricing'])->name('pricing.store');
+            Route::post('/pricing/update', [VoucherController::class, 'updatePricing'])->name('pricing.update');
+            Route::post('/pricing/seed', [VoucherController::class, 'seedPricing'])->name('pricing.seed');
+            Route::delete('/pricing/{pricing}', [VoucherController::class, 'deletePricing'])->name('pricing.delete');
             Route::get('/purchases', [VoucherController::class, 'purchases'])->name('purchases');
             Route::get('/generate', [VoucherController::class, 'generate'])->name('generate');
             Route::post('/generate', [VoucherController::class, 'storeGenerate'])->name('generate.store');

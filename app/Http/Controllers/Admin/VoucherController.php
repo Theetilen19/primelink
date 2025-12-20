@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\VoucherPricing;
 use Illuminate\Http\Request;
 
 class VoucherController extends Controller
@@ -10,10 +11,10 @@ class VoucherController extends Controller
     public function index()
     {
         $stats = [
-            'total_sales' => \App\Models\VoucherPurchase::where('status', 'completed')->sum('amount'),
-            'total_vouchers' => \App\Models\VoucherPurchase::count(),
-            'pending_vouchers' => \App\Models\VoucherPurchase::where('status', 'pending')->count(),
-            'active_pricing' => \App\Models\VoucherPricing::where('is_active', true)->count(),
+            'total_sales' => \App\Models\VoucherPurchase::where('status', 'completed')->sum('amount') ?? 0,
+            'total_vouchers' => \App\Models\VoucherPurchase::count() ?? 0,
+            'pending_vouchers' => \App\Models\VoucherPurchase::where('status', 'pending')->count() ?? 0,
+            'active_pricing' => VoucherPricing::where('is_active', true)->count() ?? 0,
         ];
 
         $recent_purchases = \App\Models\VoucherPurchase::latest()->limit(10)->get();
@@ -23,8 +24,31 @@ class VoucherController extends Controller
 
     public function pricing()
     {
-        $pricings = \App\Models\VoucherPricing::all();
+        $pricings = VoucherPricing::orderBy('duration')->get();
         return view('admin.vouchers.pricing', compact('pricings'));
+    }
+
+    public function createPricing()
+    {
+        return view('admin.vouchers.pricing-create');
+    }
+
+    public function storePricing(Request $request)
+    {
+        $validated = $request->validate([
+            'package_name' => 'required|string|max:255',
+            'customer_price' => 'required|numeric|min:0',
+            'agent_price' => 'required|numeric|min:0',
+            'commission_amount' => 'required|numeric|min:0',
+            'duration' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
+
+        VoucherPricing::create($validated);
+
+        return redirect()->route('admin.vouchers.pricing')->with('success', 'Pricing berhasil ditambahkan!');
     }
 
     public function updatePricing(Request $request)
@@ -34,18 +58,46 @@ class VoucherController extends Controller
             'customer_price' => 'required|numeric|min:0',
             'agent_price' => 'required|numeric|min:0',
             'commission_amount' => 'required|numeric|min:0',
-            'is_active' => 'boolean',
         ]);
 
-        $pricing = \App\Models\VoucherPricing::find($request->id);
+        $pricing = VoucherPricing::find($request->id);
         $pricing->update([
             'customer_price' => $validated['customer_price'],
             'agent_price' => $validated['agent_price'],
             'commission_amount' => $validated['commission_amount'],
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->back()->with('success', 'Pricing updated successfully!');
+        return redirect()->back()->with('success', 'Pricing berhasil diupdate!');
+    }
+
+    public function deletePricing(VoucherPricing $pricing)
+    {
+        $pricing->delete();
+        return redirect()->route('admin.vouchers.pricing')->with('success', 'Pricing berhasil dihapus!');
+    }
+
+    public function seedPricing()
+    {
+        $pricings = [
+            ['package_name' => 'Voucher 1 Jam', 'customer_price' => 3000, 'agent_price' => 2500, 'commission_amount' => 500, 'duration' => 1],
+            ['package_name' => 'Voucher 3 Jam', 'customer_price' => 5000, 'agent_price' => 4000, 'commission_amount' => 1000, 'duration' => 3],
+            ['package_name' => 'Voucher 6 Jam', 'customer_price' => 8000, 'agent_price' => 6500, 'commission_amount' => 1500, 'duration' => 6],
+            ['package_name' => 'Voucher 12 Jam', 'customer_price' => 12000, 'agent_price' => 10000, 'commission_amount' => 2000, 'duration' => 12],
+            ['package_name' => 'Voucher 24 Jam', 'customer_price' => 20000, 'agent_price' => 17000, 'commission_amount' => 3000, 'duration' => 24],
+            ['package_name' => 'Voucher 3 Hari', 'customer_price' => 50000, 'agent_price' => 42000, 'commission_amount' => 8000, 'duration' => 72],
+            ['package_name' => 'Voucher 7 Hari', 'customer_price' => 100000, 'agent_price' => 85000, 'commission_amount' => 15000, 'duration' => 168],
+            ['package_name' => 'Voucher 30 Hari', 'customer_price' => 350000, 'agent_price' => 300000, 'commission_amount' => 50000, 'duration' => 720],
+        ];
+
+        foreach ($pricings as $pricing) {
+            VoucherPricing::updateOrCreate(
+                ['package_name' => $pricing['package_name']],
+                array_merge($pricing, ['is_active' => true])
+            );
+        }
+
+        return redirect()->route('admin.vouchers.pricing')->with('success', '8 data pricing sample berhasil dibuat!');
     }
 
     public function purchases(Request $request)
