@@ -171,17 +171,8 @@
         </a>
     </nav>
 
-    <!-- User Info & Logout -->
+    <!-- Logout -->
     <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-slate-900 to-transparent">
-        <div class="flex items-center space-x-3 px-4 py-2 mb-2">
-            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-cyan-300">Administrator</p>
-            </div>
-        </div>
         <div class="flex space-x-2">
             <a href="{{ route('admin.change-password') }}" class="flex-1 flex items-center justify-center px-3 py-2 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition text-sm">
                 <i class="fas fa-key mr-2"></i>Password
