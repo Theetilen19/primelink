@@ -87,6 +87,16 @@
 - **Network Segments**: Manajemen segmen jaringan
 - **Maintenance Logs**: Riwayat maintenance infrastruktur
 
+### � **O*LT Management** (NEW v1.3.0)
+- **OLT Dashboard**: Monitoring semua OLT dengan statistik ONU
+- **ONU Status**: Real-time status (Online, Offline, LOS, DyingGasp)
+- **Optical Signal**: RX/TX Power monitoring dengan indikator kualitas
+- **Hardware Monitoring**: Temperature dan Fan speed (RPM)
+- **PON Port Management**: Status dan kapasitas per port
+- **ONU Actions**: Reboot, status update, customer assignment
+- **Status History**: Tracking perubahan status ONU
+- **Search & Filter**: Cari ONU berdasarkan SN, MAC, customer
+
 ### 👨‍💼 **Agent System**
 - **Agent Management**: CRUD agen penjualan
 - **Balance System**: Manajemen saldo deposit agen
@@ -382,7 +392,17 @@ GEMBOK LARA dibangun dengan standar keamanan Laravel:
 
 ## 📝 Changelog
 
-### Version 1.2.0 (Current - December 2025)
+### Version 1.3.0 (Current - December 2025)
+- ✅ OLT Management System for FTTH network monitoring
+- ✅ ONU status monitoring (Online, Offline, LOS, DyingGasp)
+- ✅ Optical signal monitoring (RX/TX Power, Temperature, Voltage)
+- ✅ Fan status and temperature monitoring for OLT
+- ✅ ONU reboot and status history tracking
+- ✅ Customer assignment to ONU devices
+- ✅ Customer portal login with PPPoE credentials
+- ✅ GUI Integration Settings for all services (Mikrotik, RADIUS, GenieACS, WhatsApp, Midtrans, Xendit)
+
+### Version 1.2.0 (December 2025)
 - ✅ RADIUS Server Integration (FreeRADIUS)
 - ✅ SNMP Network Monitoring
 - ✅ CRM Integration (HubSpot/Salesforce/Zoho)
