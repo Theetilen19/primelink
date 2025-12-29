@@ -40,16 +40,27 @@ class AgentController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20|unique:agents,phone',
             'email' => 'nullable|email|max:255',
-            'password' => 'nullable|string|min:6',
+            'password' => 'required|string|min:6',
             'address' => 'nullable|string',
         ]);
 
+        // Generate username from email or phone
+        $username = $validated['email'] 
+            ? explode('@', $validated['email'])[0] 
+            : 'agent' . ($validated['phone'] ?? time());
+        
+        // Make sure username is unique
+        $baseUsername = $username;
+        $counter = 1;
+        while (\App\Models\Agent::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        $validated['username'] = $username;
         $validated['status'] = 'active';
         $validated['balance'] = 0;
-        
-        if (isset($validated['password'])) {
-            $validated['password'] = bcrypt($validated['password']);
-        }
+        $validated['password'] = bcrypt($validated['password']);
 
         \App\Models\Agent::create($validated);
 
