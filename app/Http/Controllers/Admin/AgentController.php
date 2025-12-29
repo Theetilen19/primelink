@@ -36,7 +36,7 @@ class AgentController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20|unique:agents,phone',
             'email' => 'nullable|email|max:255',
@@ -45,9 +45,9 @@ class AgentController extends Controller
         ]);
 
         // Generate username from email or phone
-        $username = $validated['email'] 
-            ? explode('@', $validated['email'])[0] 
-            : 'agent' . ($validated['phone'] ?? time());
+        $username = $request->email 
+            ? explode('@', $request->email)[0] 
+            : 'agent' . ($request->phone ?? time());
         
         // Make sure username is unique
         $baseUsername = $username;
@@ -57,12 +57,16 @@ class AgentController extends Controller
             $counter++;
         }
 
-        $validated['username'] = $username;
-        $validated['status'] = 'active';
-        $validated['balance'] = 0;
-        $validated['password'] = bcrypt($validated['password']);
-
-        \App\Models\Agent::create($validated);
+        \App\Models\Agent::create([
+            'username' => $username,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'address' => $request->address,
+            'status' => 'active',
+            'balance' => 0,
+        ]);
 
         return redirect()->route('admin.agents.index')
             ->with('success', 'Agent created successfully!');
