@@ -8,6 +8,7 @@ use App\Models\OltPonPort;
 use App\Models\OltFan;
 use App\Models\OnuStatusLog;
 use App\Models\IntegrationSetting;
+use Illuminate\Support\Facades\Log;
 
 class OltService
 {
@@ -15,11 +16,28 @@ class OltService
     protected $snmpRetries = 1;
 
     /**
+     * Check if SNMP extension is available
+     */
+    public function isSnmpAvailable(): bool
+    {
+        return function_exists('snmp2_get');
+    }
+
+    /**
      * Test connection to OLT via SNMP
      */
     public function testConnection(Olt $olt): array
     {
+        if (!$this->isSnmpAvailable()) {
+            return [
+                'success' => false, 
+                'message' => 'PHP SNMP extension tidak terinstall. Jalankan: sudo apt install php-snmp && sudo systemctl restart php-fpm'
+            ];
+        }
+
         try {
+            snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
+            
             $result = @snmp2_get(
                 $olt->ip_address . ':' . $olt->snmp_port,
                 $olt->snmp_community,
@@ -36,8 +54,9 @@ class OltService
                 ];
             }
 
-            return ['success' => false, 'message' => 'SNMP request failed'];
+            return ['success' => false, 'message' => 'SNMP request failed - periksa IP, port, dan community string'];
         } catch (\Exception $e) {
+            Log::error('OLT SNMP test failed: ' . $e->getMessage());
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -47,7 +66,16 @@ class OltService
      */
     public function syncOlt(Olt $olt): array
     {
+        if (!$this->isSnmpAvailable()) {
+            return [
+                'success' => false, 
+                'message' => 'PHP SNMP extension tidak terinstall'
+            ];
+        }
+
         try {
+            snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
+            
             $data = [];
 
             // Get system uptime
@@ -74,6 +102,7 @@ class OltService
 
             return ['success' => true, 'message' => 'OLT synced successfully', 'data' => $data];
         } catch (\Exception $e) {
+            Log::error('OLT sync failed: ' . $e->getMessage());
             $olt->update(['status' => 'offline']);
             return ['success' => false, 'message' => $e->getMessage()];
         }
