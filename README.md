@@ -4,8 +4,11 @@
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql)
 ![Chart.js](https://img.shields.io/badge/Chart.js-4.x-FF6384?style=for-the-badge&logo=chartdotjs)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions)
 
 **GEMBOK LARA** adalah sistem manajemen tagihan dan operasional ISP (Internet Service Provider) yang dibangun menggunakan **Laravel 12**. Sistem ini dirancang dengan antarmuka modern, analitik mendalam, dan fitur lengkap untuk mengelola bisnis ISP Anda.
+
+🌐 **Demo**: [https://isp.digitalkanaku.com/](https://isp.digitalkanaku.com/)
 
 ---
 
@@ -328,6 +331,50 @@ GEMBOK LARA dibangun dengan standar keamanan Laravel:
 - ✅ **Input Validation** - Validasi ketat pada semua input
 - ✅ **Password Hashing** - Bcrypt dengan salt
 - ✅ **Secure Headers** - HTTP security headers
+
+---
+
+## 🔄 CI/CD Pipeline
+
+Proyek ini menggunakan **GitHub Actions** dengan security checks otomatis sebelum deployment.
+
+### Pipeline Flow
+```
+Push/PR → Security Scans → Tests → Security Gate → Deploy to VPS
+```
+
+### Security Checks
+
+#### SAST (Static Application Security Testing)
+| Tool | Fungsi |
+|------|--------|
+| **PHPStan** | Static analysis untuk PHP (level 5) |
+| **Psalm** | Taint analysis untuk deteksi SQL injection, XSS |
+| **Semgrep** | Pattern-based security scanning |
+| **CodeQL** | GitHub's advanced security analysis |
+
+#### Dependency Vulnerability Scan
+| Tool | Fungsi |
+|------|--------|
+| **Composer Audit** | Scan vulnerabilities di PHP packages |
+| **PHP Security Checker** | Symfony security advisories |
+| **NPM Audit** | Scan vulnerabilities di JavaScript packages |
+
+### Workflow Triggers
+- **Push ke `main`**: Full pipeline + deploy ke VPS
+- **Push ke `dev`**: Security checks + tests (tanpa deploy)
+- **Pull Request**: Security checks + tests
+
+### Deployment
+- Auto-deploy ke VPS via SSH setelah semua security checks pass
+- Laravel optimization (config/route/view cache)
+- Zero-downtime deployment
+
+### Dependabot
+- Auto-update dependencies setiap minggu (Senin)
+- Monitoring: Composer, NPM, GitHub Actions
+
+Lihat detail konfigurasi di `.github/workflows/ci-security.yml`
 
 ---
 

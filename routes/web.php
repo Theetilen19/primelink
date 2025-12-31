@@ -88,6 +88,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/purchases', [VoucherController::class, 'purchases'])->name('purchases');
             Route::get('/generate', [VoucherController::class, 'generate'])->name('generate');
             Route::post('/generate', [VoucherController::class, 'storeGenerate'])->name('generate.store');
+            
+            // Hotspot Voucher Management
+            Route::get('/hotspot', [VoucherController::class, 'hotspot'])->name('hotspot');
+            Route::get('/hotspot/profiles', [VoucherController::class, 'hotspotProfiles'])->name('hotspot.profiles');
+            Route::get('/hotspot/profiles/create', [VoucherController::class, 'createHotspotProfile'])->name('hotspot.profiles.create');
+            Route::post('/hotspot/profiles', [VoucherController::class, 'storeHotspotProfile'])->name('hotspot.profiles.store');
+            Route::get('/hotspot/profiles/{profile}/edit', [VoucherController::class, 'editHotspotProfile'])->name('hotspot.profiles.edit');
+            Route::put('/hotspot/profiles/{profile}', [VoucherController::class, 'updateHotspotProfile'])->name('hotspot.profiles.update');
+            Route::delete('/hotspot/profiles/{profile}', [VoucherController::class, 'deleteHotspotProfile'])->name('hotspot.profiles.delete');
+            Route::delete('/hotspot/vouchers/{voucher}', [VoucherController::class, 'deleteHotspotVoucher'])->name('hotspot.vouchers.delete');
+            Route::post('/hotspot/vouchers/print', [VoucherController::class, 'printHotspotVouchers'])->name('hotspot.vouchers.print');
+            Route::get('/hotspot/sync', [VoucherController::class, 'hotspotSync'])->name('hotspot.sync');
+            Route::post('/hotspot/sync', [VoucherController::class, 'doHotspotSync'])->name('hotspot.sync.do');
         });
         
         // ODP & Cable Network Management
@@ -320,6 +333,34 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/duitku/create-payment/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'createPayment'])->name('duitku.create-payment');
         Route::post('/duitku/send-link/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'sendPaymentLink'])->name('duitku.send-link');
         Route::get('/duitku/check-status', [\App\Http\Controllers\Admin\DuitkuController::class, 'checkStatus'])->name('duitku.check-status');
+        
+        // Hotspot Management (2-Way Sync)
+        Route::prefix('hotspot')->name('hotspot.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\HotspotController::class, 'index'])->name('index');
+            
+            // Profiles
+            Route::get('/profiles', [\App\Http\Controllers\Admin\HotspotController::class, 'profiles'])->name('profiles');
+            Route::get('/profiles/create', [\App\Http\Controllers\Admin\HotspotController::class, 'createProfile'])->name('profiles.create');
+            Route::post('/profiles', [\App\Http\Controllers\Admin\HotspotController::class, 'storeProfile'])->name('profiles.store');
+            Route::get('/profiles/{profile}/edit', [\App\Http\Controllers\Admin\HotspotController::class, 'editProfile'])->name('profiles.edit');
+            Route::put('/profiles/{profile}', [\App\Http\Controllers\Admin\HotspotController::class, 'updateProfile'])->name('profiles.update');
+            Route::delete('/profiles/{profile}', [\App\Http\Controllers\Admin\HotspotController::class, 'deleteProfile'])->name('profiles.delete');
+            
+            // Vouchers
+            Route::get('/vouchers', [\App\Http\Controllers\Admin\HotspotController::class, 'vouchers'])->name('vouchers');
+            Route::get('/vouchers/generate', [\App\Http\Controllers\Admin\HotspotController::class, 'generateVouchers'])->name('vouchers.generate');
+            Route::post('/vouchers/generate', [\App\Http\Controllers\Admin\HotspotController::class, 'storeVouchers'])->name('vouchers.store');
+            Route::delete('/vouchers/{voucher}', [\App\Http\Controllers\Admin\HotspotController::class, 'deleteVoucher'])->name('vouchers.delete');
+            Route::post('/vouchers/bulk-delete', [\App\Http\Controllers\Admin\HotspotController::class, 'bulkDeleteVouchers'])->name('vouchers.bulk-delete');
+            Route::post('/vouchers/print', [\App\Http\Controllers\Admin\HotspotController::class, 'printVouchers'])->name('vouchers.print');
+            
+            // Sync
+            Route::get('/sync', [\App\Http\Controllers\Admin\HotspotController::class, 'sync'])->name('sync');
+            Route::post('/sync', [\App\Http\Controllers\Admin\HotspotController::class, 'doSync'])->name('sync.do');
+            
+            // Logs
+            Route::get('/logs', [\App\Http\Controllers\Admin\HotspotController::class, 'logs'])->name('logs');
+        });
     });
 });
 
