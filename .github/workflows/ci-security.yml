@@ -275,7 +275,8 @@ jobs:
             cd ${{ secrets.VPS_PATH }}
             
             # Pull latest code
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             
             # Install PHP dependencies
             composer install --no-dev --optimize-autoloader --no-interaction
@@ -284,14 +285,23 @@ jobs:
             npm ci
             npm run build
             
-            # Laravel optimization
+            # Clear all caches first
+            php artisan optimize:clear
+            
+            # Run migrations
+            php artisan migrate --force
+            
+            # Laravel optimization (re-cache)
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan migrate --force
+            php artisan event:cache
             
             # Restart queue worker (if using)
             php artisan queue:restart
+            
+            # Restart PHP-FPM to clear opcache
+            sudo systemctl reload php8.3-fpm || true
             
             echo "✅ Deployment completed!"
           ENDSSH
