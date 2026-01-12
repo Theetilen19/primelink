@@ -1,4 +1,4 @@
-# 🔐 GEMBOK LARA - ISP Billing & Management System
+# 🔐 PRIMELINK - ISP Billing & Management System
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -6,7 +6,7 @@
 ![Chart.js](https://img.shields.io/badge/Chart.js-4.x-FF6384?style=for-the-badge&logo=chartdotjs)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions)
 
-**GEMBOK LARA** adalah sistem manajemen tagihan dan operasional ISP (Internet Service Provider) yang dibangun menggunakan **Laravel 12**. Sistem ini dirancang dengan antarmuka modern, analitik mendalam, dan fitur lengkap untuk mengelola bisnis ISP Anda.
+**PRIMELINK** It is an ISP (Internet Service Provider) billing and operations management system built using Laravel 12. The system is designed with a modern interface, in-depth analytics, and comprehensive features to manage your ISP business.
 
 🌐 **Demo**: [https://isp.digitalkanaku.com/](https://isp.digitalkanaku.com/)
 
@@ -21,19 +21,18 @@
   <img src="img/network-map.png" alt="Network Map" width="45%">
 </div>
 
-> **Note**: Screenshot aplikasi tersedia di folder `img/`
+> **Note**: Screenshots of the application are available in the folder `img/`
 
 ---
 
-## ✨ Fitur Lengkap
+## ✨ Comprehensive Features
 
 ### 🎨 **Modern UI/UX**
-- **Theme ISP Network**: Desain modern dengan warna cyan & biru yang profesional
-- **Responsive Design**: Tampilan optimal di desktop, tablet, dan mobile
-- **Dark Sidebar**: Sidebar dengan gradient elegan dan navigasi intuitif
-- **Interactive Charts**: Grafik analitik menggunakan Chart.js
-- **Smooth Animations**: Transisi dan hover effects yang halus
-
+- **Theme ISP Network**: Modern design with professional cyan and blue colors
+- **Responsive Design**: Optimized display for desktop, tablet, and mobile devices
+- **Dark Sidebar**: Sidebar with an elegant gradient and intuitive navigation.
+- **Interactive Charts**: Analytical charts using Chart.js
+- **Smooth Animations**: Smooth transitions and hover effects.
 ### 📊 **Dashboard Analytics**
 - **Real-time Statistics**: 
   - Total Customers & Active Status
@@ -45,16 +44,16 @@
   - Customer Growth Chart
   - Package Distribution (Doughnut Chart)
   - Invoice Status (Pie Chart)
-- **Recent Activity**: Invoice dan customer terbaru
-- **Quick Actions**: Akses cepat ke fitur utama
+- Recent Activity: Latest invoices and customers
+- Quick Actions: Quick access to main features
 
 ### 👥 **Customer Management**
 - **CRUD Lengkap**: Create, Read, Update, Delete customer
-- **Customer Profile**: Detail lengkap dengan statistik
-- **Package Assignment**: Assign paket internet ke customer
-- **Status Management**: Active, Inactive, Suspended
-- **Search & Filter**: Pencarian dan filter berdasarkan status/paket
-- **Invoice History**: Riwayat tagihan per customer
+- Customer Profile: Complete details with statistics
+- Package Assignment: Assign internet packages to customers
+- Status Management: Active, Inactive, Suspended
+- Search & Filter: Search and filter by status or package
+- Invoice History: Billing history per customer
 
 ### 💰 **Invoice & Billing**
 - **Auto Invoice Generation**: Generate invoice otomatis
